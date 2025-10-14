@@ -1,4 +1,4 @@
-# 📄 Smart ChatBot 🤖
+# 📄 Smart PDF RAG ChatBot 🤖
 
 This is a simple **Streamlit ChatBot** app powered by **OpenAI**, **LangChain**, **RAG (Retrieval-Augmented Generation)**, and **FAISS** for vector storage.  
 The app allows users to **upload a text-based PDF document** and ask natural language questions related to the content of the uploaded file.
@@ -28,9 +28,12 @@ The app allows users to **upload a text-based PDF document** and ask natural lan
 ## 📦 Folder Structure
 
 ```
-your-repo/
+pdf_rag_chatbot/
 ├── app.py             # Main Streamlit app file
 └── README.md           # Project documentation
+└── Dockerfile          # Dockerfile
+└── requirements.txt    # Requirements file
+└── keyfile.txt         # OpenAI key stored in a text file (No available on repo, create when running on local) [REQUIRED]
 ```
 
 ---
@@ -51,32 +54,25 @@ your-repo/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
+git clone https://github.com/siddharthsingh5010/pdf_rag_chatbot
+cd pdf_rag_chatbot
 ```
 
-### 2. Install dependencies
+### 2. Create keyfile.txt
 
-Create a virtual environment and install required packages:
+Create a text file in currect directory which stores your OPENAI key
+
+
+### 3. Builed Docker Image
 
 ```bash
-pip install -r requirements.txt
+docker build -t pdf_rag_app .
 ```
-
-### 3. Set your OpenAI API Key
-
-You can export it in your terminal session:
-
-```bash
-export openai_key=sk-...your_key_here...
-```
-
-Or add this in your shell config (`~/.bashrc`, `~/.zshrc`, etc.).
 
 ### 4. Run the app
 
 ```bash
-streamlit run app.py
+docker run -p 8501:8501 pdf_rag_app
 ```
 
 ---
@@ -96,3 +92,4 @@ MIT License
 
 Author
 Siddharth Singh
+www.nomadicsid.com
