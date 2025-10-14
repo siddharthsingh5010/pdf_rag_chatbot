@@ -6,5 +6,5 @@ duckduckgo-search
 ctransformers
 wikipedia
 tiktoken
-faiss-gpu
+faiss-cpu
 pypdf

@@ -21,14 +21,16 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 
 # Getting and setting Open AI API Key - This is required to use OpenAI model
-os.environ["OPENAI_API_KEY"] = os.environ.get("openai_key")
+with open("keyfile.txt") as f:
+    key = f.read().strip()
+os.environ["OPENAI_API_KEY"] = key
 
 # Defining LLM Model and Splitter
 llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo")
 text_splitter = RecursiveCharacterTextSplitter()
 
 # Title of the app
-st.title("Smart ChatBot 🤖")
+st.title("Smart ChatBot : Ask Questions from PDF Documents🤖")
 
 # File upload widget
 uploaded_file = st.file_uploader("Choose a file", type=["pdf"])
