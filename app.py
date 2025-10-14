@@ -32,6 +32,14 @@ text_splitter = RecursiveCharacterTextSplitter()
 # Title of the app
 st.title("Smart ChatBot : Ask Questions from PDF Documents🤖")
 
+st.markdown(
+    "[💻 View Source on GitHub](https://github.com/siddharthsingh5010/pdf_rag_chatbot)", 
+    unsafe_allow_html=True
+)
+st.markdown(
+    "[Owner : Siddharth Singh](https://www.nomadicsid.com)", 
+    unsafe_allow_html=True
+)
 # File upload widget
 uploaded_file = st.file_uploader("Choose a file", type=["pdf"])
 
