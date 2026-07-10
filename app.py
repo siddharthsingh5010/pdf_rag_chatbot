@@ -6,31 +6,22 @@
 # Importing Libraries
 import streamlit as st
 import os
-import time
-from langchain.llms import OpenAI
-from langchain.prompts import PromptTemplate, ChatPromptTemplate
-import openai
-from langchain.agents import load_tools,initialize_agent,AgentType,create_react_agent
-from langchain.chat_models import ChatOpenAI
-from langchain.schema import SystemMessage
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
-from langchain.document_loaders import PyPDFLoader,TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.chains import create_retrieval_chain
-
-# Getting and setting Open AI API Key - This is required to use OpenAI model
-with open("keyfile.txt") as f:
-    key = f.read().strip()
-os.environ["OPENAI_API_KEY"] = key
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
+from langchain_community.vectorstores import FAISS
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from dotenv import load_dotenv
+load_dotenv()
 
 # Defining LLM Model and Splitter
 llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo")
 text_splitter = RecursiveCharacterTextSplitter()
 
 # Title of the app
-st.title("Smart ChatBot : Ask Questions from PDF Documents🤖")
+st.title("🤖 AI Powered ChatBot : Ask Questions from PDF Documents🤖")
 
 st.markdown(
     "[💻 View Source on GitHub](https://github.com/siddharthsingh5010/pdf_rag_chatbot)", 
@@ -40,44 +31,54 @@ st.markdown(
     "[Owner : Siddharth Singh](https://www.nomadicsid.com)", 
     unsafe_allow_html=True
 )
+
 # File upload widget
 uploaded_file = st.file_uploader("Choose a file", type=["pdf"])
 
 # Display information about the uploaded file
 if uploaded_file is not None:
-    # To read file as bytes
     file_bytes = uploaded_file.read()
     st.write(f"Uploaded file: {uploaded_file.name}")
     st.write(f"File type: {uploaded_file.type}")
+
     # Saving file to disk
     save_path = os.path.join(os.getcwd(), uploaded_file.name)
     with open(save_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
+        f.write(file_bytes)
 
     # Show chat box after file upload
     st.subheader("LLM and RAG Powered ChatBot")
     user_input = st.text_input("You: ", "Type your message here...")
 
-    # document loader
-    loader = PyPDFLoader(f"{uploaded_file.name}")
+    # Build RAG pipeline
+    loader = PyPDFLoader(save_path)
     document = loader.load()
     documents = text_splitter.split_documents(document)
     embeddings = OpenAIEmbeddings()
     vector = FAISS.from_documents(documents, embeddings)
+    retriever = vector.as_retriever()
+
     prompt = ChatPromptTemplate.from_template("""Answer the following question based only on the provided context:
 
 <context>
 {context}
 </context>
 
-Question: {input}""")
+Question: {question}""")
 
-    document_chain = create_stuff_documents_chain(llm, prompt)
-    retriever = vector.as_retriever()
-    retrieval_chain = create_retrieval_chain(retriever, document_chain)   # document chain being part of the retrieval Chain
-    if user_input!='Type your message here...':
-      response = retrieval_chain.invoke({"context": "You are an AI assistant who need to examine content of document and provide concise answers",
-                                   "input": user_input})
-      st.text_area("AI : ", value=response['answer'], height=200)
+    def format_docs(docs):
+        return "\n\n".join(doc.page_content for doc in docs)
+
+    # LCEL chain: retrieve → format → prompt → LLM → parse
+    rag_chain = (
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+
+    if user_input != 'Type your message here...':
+        answer = rag_chain.invoke(user_input)
+        st.text_area("AI : ", value=answer, height=200)
 else:
     st.write("No file uploaded yet.")

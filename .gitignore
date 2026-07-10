@@ -1,1 +1,9 @@
-keyfile.txt
+.venv
+.pdf
+.csv
+.env
+.log
+__pycache__/
+.log
+.txt
+app.log

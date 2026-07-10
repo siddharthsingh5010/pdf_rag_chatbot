@@ -1,0 +1,9 @@
+.git
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+app.log
+tmp.py
+main.old.py
