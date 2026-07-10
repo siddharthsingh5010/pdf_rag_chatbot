@@ -23,7 +23,7 @@ EXPOSE 8503
 # Streamlit config: disable browser auto-open and set server address
 ENV STREAMLIT_SERVER_HEADLESS=true \
     STREAMLIT_SERVER_ADDRESS=0.0.0.0 \
-    STREAMLIT_SERVER_PORT=8503 \
+    STREAMLIT_SERVER_PORT=8504 \
     STREAMLIT_SERVER_BASE_URL_PATH=pdf-rag-chatbot
 
 # Run the Streamlit app
