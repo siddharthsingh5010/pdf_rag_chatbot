@@ -15,7 +15,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application source
-COPY app.py .env ./
+COPY app.py .env icon.png ./
 
 # Expose Streamlit default port
 EXPOSE 8503
